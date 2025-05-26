@@ -1,0 +1,7 @@
+db_data/
+node_modules/
+.cache/
+dist/
+# Logs
+logs/
+npm-debug.log*

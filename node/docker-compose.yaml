@@ -1,0 +1,55 @@
+services:
+  db:
+    image: mariadb:lts
+    container_name: db
+    ports:
+      - '3306:3306'
+    env_file:
+      - .env
+    environment:
+      MARIADB_ROOT_PASSWORD: $DATABASE_PASSWORD
+      MARIADB_DATABASE: $DATABASE_NAME
+    volumes:
+      - ./db_data:/var/lib/mysql:Z
+    healthcheck:
+      test: ['CMD', 'mariadb-admin', 'ping', '-h', 'localhost', '-uroot', '-p$DATABASE_PASSWORD']
+      interval: 2s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+  app:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: node:lts-alpine
+    container_name: ${APP_CONTAINER}
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    expose:
+      - ${APP_PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+  server:
+    restart: unless-stopped
+    image: nginx:alpine
+    container_name: node_nginx
+    ports:
+      - '${LOCAL_PORT}:${PROXY_PORT}'
+    env_file:
+      - .env
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template
+    depends_on:
+      - app
+volumes:
+  db_data:
+    driver: local
+networks:
+  default:
+    driver: bridge
+    name: fullcycle_node_network
