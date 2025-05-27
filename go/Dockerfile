@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY main.go /app/
 
-RUN go build main.go
+RUN go build -ldflags="-s -w" main.go
 
 ENTRYPOINT [ "./main" ]
 

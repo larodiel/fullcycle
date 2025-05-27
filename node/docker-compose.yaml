@@ -4,15 +4,15 @@ services:
     container_name: db
     ports:
       - '3306:3306'
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     environment:
-      MARIADB_ROOT_PASSWORD: $DATABASE_PASSWORD
-      MARIADB_DATABASE: $DATABASE_NAME
+      MARIADB_ROOT_PASSWORD: nodedb
+      MARIADB_DATABASE: nodedb
     volumes:
       - ./db_data:/var/lib/mysql:Z
     healthcheck:
-      test: ['CMD', 'mariadb-admin', 'ping', '-h', 'localhost', '-uroot', '-p$DATABASE_PASSWORD']
+      test: ['CMD', 'mariadb-admin', 'ping', '-h', 'localhost', '-uroot', '-pnodedb']
       interval: 2s
       timeout: 10s
       retries: 5
@@ -27,10 +27,10 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     expose:
-      - ${APP_PORT}
+      - 3000
     depends_on:
       db:
         condition: service_healthy
@@ -39,9 +39,9 @@ services:
     image: nginx:alpine
     container_name: node_nginx
     ports:
-      - '${LOCAL_PORT}:${PROXY_PORT}'
-    env_file:
-      - .env
+      - '8080:80'
+    # env_file:
+    #   - .env
     volumes:
       - ./nginx.conf.template:/etc/nginx/templates/default.conf.template
     depends_on:

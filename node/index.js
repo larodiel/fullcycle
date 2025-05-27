@@ -5,10 +5,10 @@ import path from 'path';
 const app = express();
 
 const connection = await mysql.createConnection({
-  host: process.env.DATABASE_HOST,
-  user: process.env.DATABASE_USER,
-  database: process.env.DATABASE_NAME,
-  password: process.env.DATABASE_PASSWORD
+  host: process.env.DATABASE_HOST || 'db',
+  user: process.env.DATABASE_USER || 'root',
+  database: process.env.DATABASE_NAME || 'nodedb',
+  password: process.env.DATABASE_PASSWORD || 'nodedb'
 });
 
 await connection.execute(`
@@ -57,5 +57,5 @@ export async function createPerson(name, lastName) {
 
 const PORT = process.env.APP_PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port http://localhost:${process.env.LOCAL_PORT}`);
+  console.log(`Server running on port http://localhost:${process.env.LOCAL_PORT || 8080}`);
 });
